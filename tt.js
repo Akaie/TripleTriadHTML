@@ -5,8 +5,10 @@
 	let field = [null,null,null,null,null,null,null,null,null];
 	let turn_player = 0;
 	let turn_count = 1;
+	let com = 0;
+	let mod = 0;
 	
-	async function Move(player, hand, field_pos) {
+	 function Move(player, hand, field_pos) {
 		let card = null;
 		let atk = null;
 		let def = null;
@@ -24,58 +26,251 @@
 		}
 		card.field_pos = field_pos;
 		field[field_pos] = card;
-		await Flipper(card, atk, def);
+		if(mod == 1)
+			PlusFlipper(card, atk, def);
+		else if(mod == 2)
+			SameFlipper(card, atk, def);
+		else
+			Flipper(card, atk, def);
 		const newPromise = new Promise( (resolve, reject) => setTimeout(() => { resolve("Move Done"); }, 10) );
 	}
 	
-	async function Flipper(card, atk, def) {
-		var left = null;
-		var right = null;
-		var top = null;
-		var bottom = null;
-		field_pos = Number(card.field_pos);
-		if(field_pos > 0 && field_pos != 3 && field_pos != 6) {
-			let i = field_pos-1;
-			left = field[i];
+	function SameFlipper(card, atk, def) {
+		let {left, right, top, bottom} = GetNeighbors(Number(card.field_pos));
+		if(left != null && right != null) {
+			if(left.right == card.left && right.left == card.right && (left.color == def || right.color == def)) {
+				if(left.color == def) {
+					left.color = atk;
+					left.animation = 'animation-name: leftspin; animation-duration: 2s';
+					if(com == 1)
+						 Flipper(left, atk, def);
+				}
+				if (right.color == def) {
+					right.color = atk;
+					right.animation = 'animation-name: rightspin; animation-duration: 2s';
+					if(com == 1)
+						 Flipper(right, atk, def);
+				}
+			}
 		}
-		if(field_pos > 2) {
-			let i = field_pos-3;
-			top = field[i];
+		if(left != null && top != null) {
+			if(left.right == card.left && top.bottom == card.top && (left.color == def || top.color == def)) {
+				if(left.color == def) {
+					left.color = atk;
+					left.animation = 'animation-name: leftspin; animation-duration: 2s';
+					if(com == 1)
+						 Flipper(left, atk, def);
+				}
+				if (top.color == def) {
+					top.color = atk;
+					top.animation = 'animation-name: topspin; animation-duration: 2s';
+					if(com == 1)
+						 Flipper(top, atk, def);
+				}
+			}
 		}
-		if(field_pos < 8 && field_pos != 2 && field_pos != 5) {
-			let i = field_pos+1;
-			right = field[i];
+		if(left != null && bottom != null) {
+			if(left.right == card.left && bottom.top == card.bottom && (left.color == def || bottom.color == def)) {
+				if(left.color == def) {
+					left.color = atk;
+					left.animation = 'animation-name: leftspin; animation-duration: 2s';
+					if(com == 1)
+						 Flipper(left, atk, def);
+				}
+				if (bottom.color == def) {
+					bottom.color = atk;
+					bottom.animation = 'animation-name: topspin; animation-duration: 2s';
+					if(com == 1)
+						 Flipper(bottom, atk, def);
+				}
+			}
 		}
-		if(field_pos < 6) {
-			let i = field_pos+3;
-			bottom = field[i];
+		if(right != null && top != null) {
+			if(right.left == card.right && top.bottom == card.top && (right.color == def || top.color == def)) {
+				if(right.color == def) {
+					right.color = atk;
+					right.animation = 'animation-name: leftspin; animation-duration: 2s';
+					if(com == 1)
+						 Flipper(right, atk, def);
+				}
+				if (top.color == def) {
+					top.color = atk;
+					top.animation = 'animation-name: topspin; animation-duration: 2s';
+					if(com == 1)
+						 Flipper(top, atk, def);
+				}
+			}
 		}
+		if(right != null && bottom != null) {
+			if(right.left == card.right && bottom.top == card.bottom && (right.color == def || bottom.color == def)) {
+				if(right.color == def) {
+					right.color = atk;
+					right.animation = 'animation-name: leftspin; animation-duration: 2s';
+					if(com == 1)
+						 Flipper(right, atk, def);
+				}
+				if (bottom.color == def) {
+					bottom.color = atk;
+					bottom.animation = 'animation-name: topspin; animation-duration: 2s';
+					if(com == 1)
+						 Flipper(bottom, atk, def);
+				}
+			}
+		}
+		if(top != null && bottom != null) {
+			if(top.bottom == card.top && bottom.top == card.bottom && (top.color == def || bottom.color == def)) {
+				if(top.color == def) {
+					top.color = atk;
+					top.animation = 'animation-name: leftspin; animation-duration: 2s';
+					if(com == 1)
+						 Flipper(top, atk, def);
+				}
+				if (bottom.color == def) {
+					bottom.color = atk;
+					bottom.animation = 'animation-name: topspin; animation-duration: 2s';
+					if(com == 1)
+						 Flipper(bottom, atk, def);
+				}
+			}
+		}
+		 Flipper(card, atk, def, doCombo = 0);
+		const newPromise = new Promise( (resolve, reject) => setTimeout(() => { resolve("Same Flipper Done"); }, 10) );
+	}
+	
+	function PlusFlipper(card, atk, def) {
+		let {left, right, top, bottom} = GetNeighbors(Number(card.field_pos));
+		if(left != null && right != null) {
+			if(left.right + card.left == right.left + card.right && (left.color == def || right.color == def)) {
+				if(left.color == def) {
+					left.color = atk;
+					left.animation = 'animation-name: leftspin; animation-duration: 2s';
+					if(com == 1)
+						 Flipper(left, atk, def);
+				}
+				if (right.color == def) {
+					right.color = atk;
+					right.animation = 'animation-name: rightspin; animation-duration: 2s';
+					if(com == 1)
+						 Flipper(right, atk, def);
+				}
+			}
+		}
+		if(left != null && top != null) {
+			if(left.right + card.left == top.bottom + card.top && (left.color == def || top.color == def)) {
+				if(left.color == def) {
+					left.color = atk;
+					left.animation = 'animation-name: leftspin; animation-duration: 2s';
+					if(com == 1)
+						 Flipper(left, atk, def);
+				}
+				if (top.color == def) {
+					top.color = atk;
+					top.animation = 'animation-name: topspin; animation-duration: 2s';
+					if(com == 1)
+						 Flipper(top, atk, def);
+				}
+			}
+		}
+		if(left != null && bottom != null) {
+			if(left.right + card.left == bottom.top + card.bottom && (left.color == def || bottom.color == def)) {
+				if(left.color == def) {
+					left.color = atk;
+					left.animation = 'animation-name: leftspin; animation-duration: 2s';
+					if(com == 1)
+						 Flipper(left, atk, def);
+				}
+				if (bottom.color == def) {
+					bottom.color = atk;
+					bottom.animation = 'animation-name: topspin; animation-duration: 2s';
+					if(com == 1)
+						 Flipper(bottom, atk, def);
+				}
+			}
+		}
+		if(right != null && top != null) {
+			if(right.left + card.right == top.bottom + card.top && (right.color == def || top.color == def)) {
+				if(right.color == def) {
+					right.color = atk;
+					right.animation = 'animation-name: leftspin; animation-duration: 2s';
+					if(com == 1)
+						 Flipper(right, atk, def);
+				}
+				if (top.color == def) {
+					top.color = atk;
+					top.animation = 'animation-name: topspin; animation-duration: 2s';
+					if(com == 1)
+						 Flipper(top, atk, def);
+				}
+			}
+		}
+		if(right != null && bottom != null) {
+			if(right.left + card.right == bottom.top + card.bottom && (right.color == def || bottom.color == def)) {
+				if(right.color == def) {
+					right.color = atk;
+					right.animation = 'animation-name: leftspin; animation-duration: 2s';
+					if(com == 1)
+						 Flipper(right, atk, def);
+				}
+				if (bottom.color == def) {
+					bottom.color = atk;
+					bottom.animation = 'animation-name: topspin; animation-duration: 2s';
+					if(com == 1)
+						 Flipper(bottom, atk, def);
+				}
+			}
+		}
+		if(top != null && bottom != null) {
+			if(top.bottom + card.top == bottom.top + card.bottom && (top.color == def || bottom.color == def)) {
+				if(top.color == def) {
+					top.color = atk;
+					top.animation = 'animation-name: leftspin; animation-duration: 2s';
+					if(com == 1)
+						 Flipper(top, atk, def);
+				}
+				if (bottom.color == def) {
+					bottom.color = atk;
+					bottom.animation = 'animation-name: topspin; animation-duration: 2s';
+					if(com == 1)
+						 Flipper(bottom, atk, def);
+				}
+			}
+		}
+		 Flipper(card, atk, def, doCombo = 0);
+		const newPromise = new Promise( (resolve, reject) => setTimeout(() => { resolve("Same Flipper Done"); }, 10) );
+	}
+	
+	 function Flipper(card, atk, def, doCombo = 1) {
+		let {left, right, top, bottom} = GetNeighbors(Number(card.field_pos));
 		if(left != null) {
 			if(left.right < card.left && left.color == def) {
 				left.color = atk;
 				left.animation = 'animation-name: leftspin; animation-duration: 2s';
-				await Flipper(left, atk, def);
+				if(com == 1 && doCombo == 1)
+					 Flipper(left, atk, def);
 			}
 		}
 		if(top != null) {
 			if(top.bottom < card.top && top.color == def) {
 				top.color = atk;
 				top.animation = 'animation-name: topspin; animation-duration: 2s';
-				await Flipper(top, atk, def);
+				if(com == 1 && doCombo == 1)
+					 Flipper(top, atk, def);
 			}
 		}
 		if(right != null) {
 			if(right.left < card.right && right.color == def) {
 				right.color = atk;
 				right.animation = 'animation-name: rightspin; animation-duration: 1s';
-				await Flipper(right, atk, def);
+				if(com == 1 && doCombo == 1)
+					 Flipper(right, atk, def);
 			}
 		}
 		if(bottom != null) {
 			if(bottom.top < card.bottom && bottom.color == def) {
 				bottom.color = atk;
 				bottom.animation = 'animation-name: bottomspin; animation-duration: 1s';
-				await Flipper(bottom, atk, def);
+				if(com == 1 && doCombo == 1)
+					 Flipper(bottom, atk, def);
 			}
 		}
 		const newPromise = new Promise( (resolve, reject) => setTimeout(() => { resolve("Flipper Done"); }, 10) );
@@ -151,69 +346,358 @@
 		}
 	}
 	
-	async function CalcFlipper(card, atk, def, findex) {
-		let left = null;
-		let right = null;
-		let top = null;
-		let bottom = null;
+	 function SameCalcFlipper(card, atk, def, findex) {
 		let score = 0;
-		if(findex > 0) {
-			left = field[findex-1];
+		let {left, right, top, bottom} = GetNeighbors(findex);
+		if(left != null && right != null) {
+			if(left.right == card.left && right.left == card.right && (left.color == def || right.color == def)) {
+				if(left.color == def) {
+					score += (left.left + left.right + left.top + left.bottom)*(Math.floor(Math.random() * 2)+1);
+					if(GetCalcNeighbors(card.field_pos).left != null || GetCalcNeighbors(card.field_pos).left == "wall")
+						score += (10 - card.left)*(Math.floor(Math.random() * 2)+1);
+					if(com == 1)
+						score +=  CalcFlipper(left, atk, def, findex);
+				}
+				if (right.color == def) {
+					score += (right.left + right.right + right.top + right.bottom)*(Math.floor(Math.random() * 2)+1);
+					if(GetCalcNeighbors(card.field_pos).right != null || GetCalcNeighbors(card.field_pos).right == "wall")
+						score += (10 - card.right)*(Math.floor(Math.random() * 2)+1);
+					if(com == 1)
+						score +=  CalcFlipper(right, atk, def, findex);
+				}
+			}
 		}
-		if(findex > 2) {
-			top = field[findex-3];
+		if(left != null && top != null) {
+			if(left.right == card.left && top.bottom == card.top && (left.color == def || top.color == def)) {
+				if(left.color == def) {
+					score += (left.left + left.right + left.top + left.bottom)*(Math.floor(Math.random() * 2)+1);
+					if(GetCalcNeighbors(card.field_pos).left != null || GetCalcNeighbors(card.field_pos).left == "wall")
+						score += (10 - card.left)*(Math.floor(Math.random() * 2)+1);
+					if(com == 1)
+						score +=  CalcFlipper(left, atk, def, findex);
+				}
+				if (top.color == def) {
+					score += (top.left + top.right + top.top + top.bottom)*(Math.floor(Math.random() * 2)+1);
+					if(GetCalcNeighbors(card.field_pos).top != null || GetCalcNeighbors(card.field_pos).top == "wall")
+						score += (10 - card.top)*(Math.floor(Math.random() * 2)+1);
+					if(com == 1)
+						score +=  CalcFlipper(top, atk, def, findex);
+				}
+			}
 		}
-		if(findex < 8) {
-			right = field[findex+1];
+		if(left != null && bottom != null) {
+			if(left.right == card.left && bottom.top == card.bottom && (left.color == def || bottom.color == def)) {
+				if(left.color == def) {
+					score += (left.left + left.right + left.top + left.bottom)*(Math.floor(Math.random() * 2)+1);
+					if(GetCalcNeighbors(card.field_pos).left != null || GetCalcNeighbors(card.field_pos).left == "wall")
+						score += (10 - card.left)*(Math.floor(Math.random() * 2)+1);
+					if(com == 1)
+						score +=  CalcFlipper(left, atk, def, findex);
+				}
+				if (bottom.color == def) {
+					score += (bottom.left + bottom.right + bottom.top + bottom.bottom)*(Math.floor(Math.random() * 2)+1);
+					if(GetCalcNeighbors(card.field_pos).bottom != null || GetCalcNeighbors(card.field_pos).bottom == "wall")
+						score += (10 - card.bottom)*(Math.floor(Math.random() * 2)+1);
+					if(com == 1)
+						score +=  CalcFlipper(bottom, atk, def, findex);
+				}
+			}
 		}
-		if(findex < 6) {
-			bottom = field[findex+3];
+		if(right != null && top != null) {
+			if(right.left == card.right && top.bottom == card.top && (right.color == def || top.color == def)) {
+				if(right.color == def) {
+					score += (right.left + right.right + right.top + right.bottom)*(Math.floor(Math.random() * 2)+1);
+					if(GetCalcNeighbors(card.field_pos).right != null || GetCalcNeighbors(card.field_pos).right == "wall")
+						score += (10 - card.right)*(Math.floor(Math.random() * 2)+1);
+					if(com == 1)
+						score +=  CalcFlipper(right, atk, def, findex);
+				}
+				if (top.color == def) {
+					score += (top.left + top.right + top.top + top.bottom)*(Math.floor(Math.random() * 2)+1);
+					if(GetCalcNeighbors(card.field_pos).top != null || GetCalcNeighbors(card.field_pos).top == "wall")
+						score += (10 - card.top)*(Math.floor(Math.random() * 2)+1);
+					if(com == 1)
+						score +=  CalcFlipper(top, atk, def, findex);
+				}
+			}
 		}
+		if(right != null && bottom != null) {
+			if(right.left == card.right && bottom.top == card.bottom && (right.color == def || bottom.color == def)) {
+				if(right.color == def) {
+					score += (right.left + right.right + right.top + right.bottom)*(Math.floor(Math.random() * 2)+1);
+					if(GetCalcNeighbors(card.field_pos).right != null || GetCalcNeighbors(card.field_pos).right == "wall")
+						score += (10 - card.right)*(Math.floor(Math.random() * 2)+1);
+					if(com == 1)
+						score +=  CalcFlipper(right, atk, def, findex);
+				}
+				if (bottom.color == def) {
+					score += (bottom.left + bottom.right + bottom.top + bottom.bottom)*(Math.floor(Math.random() * 2)+1);
+					if(GetCalcNeighbors(card.field_pos).bottom != null || GetCalcNeighbors(card.field_pos).bottom == "wall")
+						score += (10 - card.bottom)*(Math.floor(Math.random() * 2)+1);
+					if(com == 1)
+						score +=  CalcFlipper(bottom, atk, def, findex);
+				}
+			}
+		}
+		if(top != null && bottom != null) {
+			if(top.bottom == card.top && bottom.top == card.bottom && (top.color == def || bottom.color == def)) {
+				if(top.color == def) {
+					score += (top.left + top.right + top.top + top.bottom)*(Math.floor(Math.random() * 2)+1);
+					if(GetCalcNeighbors(card.field_pos).top != null || GetCalcNeighbors(card.field_pos).top == "wall")
+						score += (10 - card.top)*(Math.floor(Math.random() * 2)+1);
+					if(com == 1)
+						score +=  CalcFlipper(top, atk, def, findex);
+				}
+				if (bottom.color == def) {
+					score += (bottom.left + bottom.right + bottom.top + bottom.bottom)*(Math.floor(Math.random() * 2)+1);
+					if(GetCalcNeighbors(card.field_pos).bottom != null || GetCalcNeighbors(card.field_pos).bottom == "wall")
+						score += (10 - card.bottom)*(Math.floor(Math.random() * 2)+1);
+					if(com == 1)
+						score +=  CalcFlipper(bottom, atk, def, findex);
+				}
+			}
+		}
+		score +=  CalcFlipper(card, atk, def, findex, doCombo = 0);
+		const newPromise = new Promise( (resolve, reject) => setTimeout(() => { resolve("Same Flipper Done"); }, 10) );
+		return score;
+	}
+	
+	function PlusCalcFlipper(card, atk, def, findex) {
+		let score = 0;
+		let {left, right, top, bottom} = GetNeighbors(findex);
+		if(left != null && right != null) {
+			if(left.right + card.left == right.left + card.right && (left.color == def || right.color == def)) {
+				if(left.color == def) {
+					score += (left.left + left.right + left.top + left.bottom)*(Math.floor(Math.random() * 2)+1);
+					if(GetCalcNeighbors(card.field_pos).left != null || GetCalcNeighbors(card.field_pos).left == "wall")
+						score += (10 - card.left)*(Math.floor(Math.random() * 2)+1);
+					if(com == 1)
+						score +=  CalcFlipper(left, atk, def, findex);
+				}
+				if (right.color == def) {
+					score += (right.left + right.right + right.top + right.bottom)*(Math.floor(Math.random() * 2)+1);
+					if(GetCalcNeighbors(card.field_pos).right != null || GetCalcNeighbors(card.field_pos).right == "wall")
+						score += (10 - card.right)*(Math.floor(Math.random() * 2)+1);
+					if(com == 1)
+						score +=  CalcFlipper(right, atk, def, findex);
+				}
+			}
+		}
+		if(left != null && top != null) {
+			if(left.right + card.left == top.bottom + card.top && (left.color == def || top.color == def)) {
+				if(left.color == def) {
+					score += (left.left + left.right + left.top + left.bottom)*(Math.floor(Math.random() * 2)+1);
+					if(GetCalcNeighbors(card.field_pos).left != null || GetCalcNeighbors(card.field_pos).left == "wall")
+						score += (10 - card.left)*(Math.floor(Math.random() * 2)+1);
+					if(com == 1)
+						score +=  CalcFlipper(left, atk, def, findex);
+				}
+				if (top.color == def) {
+					score += (top.left + top.right + top.top + top.bottom)*(Math.floor(Math.random() * 2)+1);
+					if(GetCalcNeighbors(card.field_pos).top != null || GetCalcNeighbors(card.field_pos).top == "wall")
+						score += (10 - card.top)*(Math.floor(Math.random() * 2)+1);
+					if(com == 1)
+						score +=  CalcFlipper(top, atk, def, findex);
+				}
+			}
+		}
+		if(left != null && bottom != null) {
+			if(left.right + card.left == bottom.top + card.bottom && (left.color == def || bottom.color == def)) {
+				if(left.color == def) {
+					score += (left.left + left.right + left.top + left.bottom)*(Math.floor(Math.random() * 2)+1);
+					if(GetCalcNeighbors(card.field_pos).left != null || GetCalcNeighbors(card.field_pos).left == "wall")
+						score += (10 - card.left)*(Math.floor(Math.random() * 2)+1);
+					if(com == 1)
+						score +=  CalcFlipper(left, atk, def, findex);
+				}
+				if (bottom.color == def) {
+					score += (bottom.left + bottom.right + bottom.top + bottom.bottom)*(Math.floor(Math.random() * 2)+1);
+					if(GetCalcNeighbors(card.field_pos).bottom != null || GetCalcNeighbors(card.field_pos).bottom == "wall")
+						score += (10 - card.bottom)*(Math.floor(Math.random() * 2)+1);
+					if(com == 1)
+						score +=  CalcFlipper(bottom, atk, def, findex);
+				}
+			}
+		}
+		if(right != null && top != null) {
+			if(right.left + card.right == top.bottom + card.top && (right.color == def || top.color == def)) {
+				if(right.color == def) {
+					score += (right.left + right.right + right.top + right.bottom)*(Math.floor(Math.random() * 2)+1);
+					if(GetCalcNeighbors(card.field_pos).right != null || GetCalcNeighbors(card.field_pos).right == "wall")
+						score += (10 - card.right)*(Math.floor(Math.random() * 2)+1);
+					if(com == 1)
+						score +=  CalcFlipper(right, atk, def, findex);
+				}
+				if (top.color == def) {
+					score += (top.left + top.right + top.top + top.bottom)*(Math.floor(Math.random() * 2)+1);
+					if(GetCalcNeighbors(card.field_pos).top != null || GetCalcNeighbors(card.field_pos).top == "wall")
+						score += (10 - card.top)*(Math.floor(Math.random() * 2)+1);
+					if(com == 1)
+						score +=  CalcFlipper(top, atk, def, findex);
+				}
+			}
+		}
+		if(right != null && bottom != null) {
+			if(right.left + card.right == bottom.top + card.bottom && (right.color == def || bottom.color == def)) {
+				if(right.color == def) {
+					score += (right.left + right.right + right.top + right.bottom)*(Math.floor(Math.random() * 2)+1);
+					if(GetCalcNeighbors(card.field_pos).right != null || GetCalcNeighbors(card.field_pos).right == "wall")
+						score += (10 - card.right)*(Math.floor(Math.random() * 2)+1);
+					if(com == 1)
+						score +=  CalcFlipper(right, atk, def, findex);
+				}
+				if (bottom.color == def) {
+					score += (bottom.left + bottom.right + bottom.top + bottom.bottom)*(Math.floor(Math.random() * 2)+1);
+					if(GetCalcNeighbors(card.field_pos).bottom != null || GetCalcNeighbors(card.field_pos).bottom == "wall")
+						score += (10 - card.bottom)*(Math.floor(Math.random() * 2)+1);
+					if(com == 1)
+						score +=  CalcFlipper(bottom, atk, def, findex);
+				}
+			}
+		}
+		if(top != null && bottom != null) {
+			if(top.bottom + card.top == bottom.top + card.bottom && (top.color == def || bottom.color == def)) {
+				if(top.color == def) {
+					score += (top.left + top.right + top.top + top.bottom)*(Math.floor(Math.random() * 2)+1);
+					if(GetCalcNeighbors(card.field_pos).top != null || GetCalcNeighbors(card.field_pos).top == "wall")
+						score += (10 - card.top)*(Math.floor(Math.random() * 2)+1);
+					if(com == 1)
+						score +=  CalcFlipper(top, atk, def, findex);
+				}
+				if (bottom.color == def) {
+					score += (bottom.left + bottom.right + bottom.top + bottom.bottom)*(Math.floor(Math.random() * 2)+1);
+					if(GetCalcNeighbors(card.field_pos).bottom != null || GetCalcNeighbors(card.field_pos).bottom == "wall")
+						score += (10 - card.bottom)*(Math.floor(Math.random() * 2)+1);
+					if(com == 1)
+						score +=  CalcFlipper(bottom, atk, def, findex);
+				}
+			}
+		}
+		score +=  CalcFlipper(card, atk, def, findex, doCombo = 0);
+		const newPromise = new Promise( (resolve, reject) => setTimeout(() => { resolve("Same Flipper Done"); }, 10) );
+		return score;
+	}
+	
+	 function CalcFlipper(card, atk, def, findex, doCombo = 1) {
+		let score = 0;
+		let {left, right, top, bottom} = GetNeighbors(findex);
 		if(left != null) {
 			if(left.right < card.left && left.color == def) {
-				score += (left.top + left.bottom + left.left + left.right)*2;
-				score += await CalcFlipper(left, atk, def);
+				score += (left.left + left.right + left.top + left.bottom)*(Math.floor(Math.random() * 2)+1);
+				if(GetCalcNeighbors(card.field_pos).left != null || GetCalcNeighbors(card.field_pos).left == "wall")
+					score += (10 - card.left)*(Math.floor(Math.random() * 2)+1);
+				if(com == 1 && doCombo == 1)
+					score +=  CalcFlipper(left, atk, def);
 			}
 		}
 		else {
 			if(findex != 0 && findex != 3 && findex != 6)
-				score -= (10 - card.left);
+				score -= (10 - card.left)*(Math.floor(Math.random() * 2)+1);
 		}
 		if(top != null) {
 			if(top.bottom < card.top && top.color == def) {
-				score += (top.top + top.bottom + top.left + top.right)*2;
-				score += await CalcFlipper(top, atk, def);
+				score += (top.left + top.right + top.top + top.bottom)*(Math.floor(Math.random() * 2)+1);
+				if(GetCalcNeighbors(card.field_pos).top != null|| GetCalcNeighbors(card.field_pos).top == "wall")
+					score += (10 - card.top)*(Math.floor(Math.random() * 2)+1);
+				if(com == 1 && doCombo == 1)
+					score +=  CalcFlipper(top, atk, def);
 			}
 		}
 		else {
 			if(findex != 0 && findex != 1 && findex != 2)
-				score -= (10 - card.top);
+				score -= (10 - card.top)*(Math.floor(Math.random() * 2)+1);
 		}
 		if(right != null) {
 			if(right.left < card.right && right.color == def) {
-				score += (right.top + right.bottom + right.left + right.right)*2;
-				score += await CalcFlipper(right, atk, def);
+				score += (right.left + right.right + right.top + right.bottom)*(Math.floor(Math.random() * 2)+1);
+				if(GetCalcNeighbors(card.field_pos).right != null || GetCalcNeighbors(card.field_pos).right == "wall")
+					score += (10 - card.right)*(Math.floor(Math.random() * 2)+1);
+				if(com == 1 && doCombo == 1)
+					score +=  CalcFlipper(right, atk, def);
 			}
 		}
 		else {
 			if(findex != 2 && findex != 5 && findex != 8)
-				score -= (10 - card.right);
+				score -= (10 - card.right)*(Math.floor(Math.random() * 2)+1);
 		}
 		if(bottom != null) {
 			if(bottom.top < card.bottom && bottom.color == def) {
-				score += (bottom.top + bottom.bottom + bottom.left + bottom.right)*2;
-				score += await CalcFlipper(bottom, atk, def);
+				score += (bottom.left + bottom.right + bottom.top + bottom.bottom)*(Math.floor(Math.random() * 2)+1);
+				if(GetCalcNeighbors(card.field_pos).bottom != null || GetCalcNeighbors(card.field_pos).bottom == "wall")
+					score += (10 - card.bottom)*(Math.floor(Math.random() * 2)+1);
+				if(com == 1 && doCombo == 1)
+					score +=  CalcFlipper(bottom, atk, def);
 			}
 		}
 		else {
 			if(findex != 6 && findex != 7 && findex != 8)
-				score -= (10 - card.bottom);
+				score -= (10 - card.bottom)*(Math.floor(Math.random() * 2)+1);
 		}
 		const newPromise = new Promise( (resolve, reject) => setTimeout(() => { resolve("Calc Done"); }, 10) );
 		return score;
 	}
 	
-	async function CalcMove(player) {
+	function GetNeighbors(field_pos) {
+		var left = null;
+		var right = null;
+		var top = null;
+		var bottom = null;
+		if(field_pos > 0 && field_pos != 3 && field_pos != 6) {
+			let i = field_pos-1;
+			left = field[i];
+		}
+		if(field_pos > 2) {
+			let i = field_pos-3;
+			top = field[i];
+		}
+		if(field_pos < 8 && field_pos != 2 && field_pos != 5) {
+			let i = field_pos+1;
+			right = field[i];
+		}
+		if(field_pos < 6) {
+			let i = field_pos+3;
+			bottom = field[i];
+		}
+		return {left, right, top, bottom};
+	}
+	
+	function GetCalcNeighbors(field_pos) {
+		var left = null;
+		var right = null;
+		var top = null;
+		var bottom = null;
+		if(field_pos > 0 && field_pos != 3 && field_pos != 6) {
+			let i = field_pos-1;
+			left = field[i];
+		}
+		if(field_pos == 0 || field_pos == 3 || field_pos == 6) {
+			left = "wall";
+		}
+		if(field_pos > 2) {
+			let i = field_pos-3;
+			top = field[i];
+		}
+		if(field_pos == 0 || field_pos == 1 || field_pos == 2) {
+			top = "wall";
+		}
+		if(field_pos < 8 && field_pos != 2 && field_pos != 5) {
+			let i = field_pos+1;
+			right = field[i];
+		}
+		if(field_pos == 2 || field_pos == 5 || field_pos == 8) {
+			right = "wall";
+		}
+		if(field_pos < 6) {
+			let i = field_pos+3;
+			bottom = field[i];
+		}
+		if(field_pos == 6 || field_pos == 7 || field_pos == 8) {
+			bottom = "wall";
+		}
+		return {left, right, top, bottom};
+	}
+	
+	 function CalcMove(player) {
 		let hand = right_player;
 		let map = new Map();
 		let atk = 'red';
@@ -229,7 +713,13 @@
 				for(let j=0; j<field.length; j++) {
 					let f = field[j];
 					if(f == null) {
-						let score = await CalcFlipper(card, atk, def, j);
+						let score = 0;
+						if (mod == 1)
+							score = PlusCalcFlipper(card, atk, def, j);
+						else if(mod == 2)
+							score =  SameCalcFlipper(card, atk, def, j);
+						else
+							score =  CalcFlipper(card, atk, def, j);
 						map.set(i + '|' + j, score);
 					}
 				}
@@ -241,12 +731,23 @@
 				keypick = key;
 				highest = value;
 			}
+			if(value == highest && Math.floor(Math.random() * 2) == 0) {
+				keypick = key;
+				highest = value;
+			}
 		}
 		const newPromise = new Promise( (resolve, reject) => setTimeout(() => { resolve("Calc Done"); }, 10) );
 		return keypick;
 	}
 	
-	async function StartGame() {
+	async function StartGame(combo = 0, mode = '') {
+		com = combo;
+		if(mode == 'plus')
+			mod = 1;
+		else if(mode == 'same')
+			mod = 2;
+		else
+			mod = 0;
 		for(let i = 0; i < 9; i++) {
 			let doc = document.getElementsByClassName('field-card-' + (i+1))[0];
 			doc.innerHtml = '';
@@ -263,13 +764,13 @@
 		await GetCards();
 		turn_player = (Math.floor(Math.random()*2) == 0) ? 'left' : 'right';
 		turn_count = 1;
-		await Draw();
+		 Draw();
 	}
 	
-	async function nextMove() {
-		let keypick = await CalcMove(turn_player);
-		await Move(turn_player, keypick.split('|')[0], keypick.split('|')[1]);
-		await Draw();
+	 function nextMove() {
+		let keypick =  CalcMove(turn_player);
+		 Move(turn_player, keypick.split('|')[0], keypick.split('|')[1]);
+		 Draw();
 		turn_player = (turn_player == 'left') ? 'right' : 'left';
 	}
 	
@@ -281,6 +782,14 @@
 				red_score += 1;
 			else
 				blue_score += 1;
+		});
+		left_player.forEach((card) => {
+			if(card != null)
+				blue_score += 1;
+		});
+		right_player.forEach((card) => {
+			if(card != null)
+				red_score += 1;
 		});
 		if(blue_score > red_score)
 			document.cookie = 'WinnerTT=blue; path=/';
